@@ -5,6 +5,16 @@ from typing import Tuple
 from custom_encryption import CustomEncDec
 
 
+# Hardcoded known ICAOs used by generator and decoder examples.
+KNOWN_ICAOS = [
+	0x45AB3C,
+	0xA1B2C3,
+	0x7C1D2E,
+	0xC0FFEE,
+	0xBADA55,
+]
+
+
 def parse_icao(icao_input: str) -> int:
 	"""Parse and validate ICAO input as a 24-bit integer."""
 	cleaned = icao_input.strip().upper().replace("0X", "")
@@ -84,7 +94,8 @@ def generate_packets(icao_input: str, mode: str, count: int) -> None:
 def main() -> None:
 	parser = argparse.ArgumentParser(
 		description=(
-			"Generate simple ADS-B DF17 hex packets from an input ICAO code. "
+			"Generate simple ADS-B DF17 hex packets from an input ICAO code "
+			"or from a hardcoded known ICAO list. "
 			"Mode 'e' encrypts all ICAOs, 'u' keeps all unencrypted, and "
 			"'m' mixes encrypted and unencrypted packets."
 		)
@@ -92,7 +103,7 @@ def main() -> None:
 	parser.add_argument(
 		"icao",
 		nargs="?",
-		help="Input ICAO code in hex (example: 45AB3C)",
+		help="Input ICAO code in hex (example: 45AB3C). If omitted, random known ICAO is used.",
 	)
 	parser.add_argument(
 		"-o",
@@ -113,7 +124,8 @@ def main() -> None:
 
 	icao_input = args.icao
 	if not icao_input:
-		icao_input = input("Enter ICAO (hex): ").strip()
+		icao_input = f"{random.choice(KNOWN_ICAOS):06X}"
+		print(f"No ICAO supplied, selected known ICAO: {icao_input}")
 
 	if args.count < 1:
 		raise ValueError("Count must be >= 1")
