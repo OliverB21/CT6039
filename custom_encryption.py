@@ -1,7 +1,7 @@
 # Note - this algorithm provides a simulation for an encryption algorithm,
 # and does not securely generate keys or encrypt data. Proceed with caution
 
-import time
+import datetime
 import ffx
 
 class CustomEncDec():
@@ -11,9 +11,9 @@ class CustomEncDec():
         self.ffx_obj = ffx.new(self.key_bytes, radix=16)
 
     def generate_key(self, icao):
-        epoch_int = round(int(time.time())/5)*5
+        datebin = int(datetime.datetime.today().strftime('%Y-%m-%d').replace("-", ""))
         icaobin = icao*4
-        return epoch_int ^ icaobin
+        return datebin ^ icaobin
     
     def encrypt_icao(self, icao):
         icao_no = ffx.FFXInteger(icao, radix=16, blocksize=6)
