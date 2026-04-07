@@ -1,12 +1,17 @@
 import argparse
+import random
 import time
 
 from ads_b_udp import ADSBUDPSocket
 from packet_generator import build_adsb_packet_hex, maybe_encrypt_icao, parse_icao
 
 
+# Hardcoded ICAO pool for random packet generation.
+# "COFFEE" is normalized to "C0FFEE" so it remains valid hexadecimal.
+KNOWN_ICAOS = ["45AB3C", "A1B2C3", "7C1D2E", "C0FFEE", "BADA55"]
+
+
 def test_send(
-    icao: str,
     option: str = "u",
     count: int = 1,
     interval_ms: int = 0,
@@ -23,14 +28,15 @@ def test_send(
         if interval_ms < 0:
             raise ValueError("Interval must be >= 0 milliseconds")
 
-        base_icao = parse_icao(icao)
         for i in range(count):
+            selected_icao = random.choice(KNOWN_ICAOS)
+            base_icao = parse_icao(selected_icao)
             packet_icao, was_encrypted = maybe_encrypt_icao(base_icao, option)
             packet_hex = build_adsb_packet_hex(packet_icao)
 
             ads_b.send_packet(packet_hex, remote_host, remote_port)
             status = "ENCRYPTED" if was_encrypted else "PLAIN"
-            print(f"{i + 1:03d}. Sent [{status}] {packet_hex}")
+            print(f"{i + 1:03d}. Sent [{status}] SRC_ICAO={selected_icao} PACKET={packet_hex}")
 
             if interval_ms > 0 and i < count - 1:
                 time.sleep(interval_ms / 1000.0)
@@ -42,7 +48,6 @@ def test_send(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Send one generated ADS-B test packet over UDP")
-    parser.add_argument("icao", help="Input ICAO code in hex (example: 45AB3C)")
     parser.add_argument(
         "-o",
         "--option",
@@ -65,7 +70,6 @@ def main() -> None:
     args = parser.parse_args()
 
     test_send(
-        icao=args.icao,
         option=args.option,
         count=args.count,
         interval_ms=args.interval_ms,
