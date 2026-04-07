@@ -11,7 +11,7 @@ class CustomEncDec():
         self.ffx_obj = ffx.new(self.key_bytes, radix=16)
 
     def generate_key(self, icao):
-        datebin = int(datetime.datetime.today().strftime('%Y-%m-%d').replace("-", ""))
+        datebin = int(datetime.datetime.now(datetime.timezone.utc).timestamp() // 5) * 5
         icaobin = icao*4
         return datebin ^ icaobin
     
