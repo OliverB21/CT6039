@@ -15,13 +15,13 @@ class PacketDecoder():
         self.dec_A1B2C3 = custom_encryption.CustomEncDec(0xA1B2C3)
         self.dec_7C1D2E = custom_encryption.CustomEncDec(0x7C1D2E)
         self.dec_C0FFEE = custom_encryption.CustomEncDec(0xC0FFEE)
-        self.dec_BADA55 = custom_encryption.CustomEncDec(0xBADA55)
+        self.dec_A58B4D = custom_encryption.CustomEncDec(0xA58B4D)
 
     def decrypt_icao(self, enc_icao):
-        for dec in [self.dec_45AB3C, self.dec_A1B2C3, self.dec_7C1D2E, self.dec_C0FFEE, self.dec_BADA55]:
+        for dec in [self.dec_45AB3C, self.dec_A1B2C3, self.dec_7C1D2E, self.dec_C0FFEE, self.dec_A58B4D]:
             decrypted = dec.decrypt_icao(enc_icao)
             print(f"Encrypted ICAO: {enc_icao}, Decrypted ICAO: {str(decrypted).upper()}")
-            if decrypted in [0x45AB3C, 0xA1B2C3, 0x7C1D2E, 0xC0FFEE, 0xBADA55]:
+            if decrypted in [0x45AB3C, 0xA1B2C3, 0x7C1D2E, 0xC0FFEE, 0xA58B4D]:
                 return decrypted
         return 0x000000
     
@@ -45,4 +45,3 @@ if __name__ == "__main__":
     print(f"Decrypted ICAO: {hex(decrypted_icao)[2:].upper()}")
     icao = decoder.read_icao(test_packet_hex)
     decrypted_icao = decoder.decrypt_icao(icao)
-    time.sleep
